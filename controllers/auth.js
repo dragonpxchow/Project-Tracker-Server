@@ -25,7 +25,10 @@ export const login = async (req, res) => {
     const token = user.generateAuthToken();
     res
       .status(200)
-      .json({ token, user: _.pick(user, ["_id", "name", "email"]) });
+      .json({
+        token,
+        user: _.pick(user, ["_id", "email", "firstName", "lastName"]),
+      });
 
     /*
     res

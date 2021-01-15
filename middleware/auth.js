@@ -6,27 +6,33 @@ export default (req, res, next) => {
   if (!config.get("requiresAuth")) return next();
 
   let token = req.header("x-auth-token");
-  console.log("User token >>>>>", ">>>>" + token + "<<<");
+  console.log(
+    "authMiddleware User token >>>>>>>>>>>>>>>>>>>>",
+    ">>>>" + token + "<<<"
+  );
 
-  // suprise why null is string
-  if (!token || token === "null") {
+  //  null or undefined is string from header
+  if (!token || token === "null" || token === "undefined") {
     return res.status(401).json({
-      msg: "No authenticaiton token, Authorisation denied",
+      name: "JsonWebTokenError",
+      error: "No authenticaiton token, Authorisation denied",
     });
   }
 
   try {
     const verified = jwt.verify(token, process.env.JWT_TOKEN_KEY); //config.get("jwtPrivateKey"));
-    if (!verified)
+    if (!verified) {
       res.status(401).json({
-        status: 401,
-        msg: "Token verification failed, Authorisation denied",
+        name: "JsonWebTokenError",
+        error: "Token verification failed, Authorisation denied",
       });
+    }
 
+    // return user data
     req.user = verified;
     next();
   } catch (error) {
-    res.json({ status: 500, msg: error });
-    //res.status(500).json({ msg: err });
+    // {name: "JsonWebTokenError", message: "jwt malformed"}
+    res.status(500).json({ name: error.name, error: error.message });
   }
 };

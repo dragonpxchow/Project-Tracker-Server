@@ -12,23 +12,37 @@ export const getUsers = async (req, res) => {
 
 // get single user
 export const getUser = async (req, res) => {
-  console.log("server user route >>>>", req);
+  console.log("Server getUser controller >>>>", req.user);
   const user = await User.findById(req.user._id).select("-password"); // except password
   res.json(user);
+  // {
+  //  token,
+  //  user: _.pick(user, ["_id", "email", "firstName", "lastName"]),
+  //}
 };
 
 export const registerUser = async (req, res) => {
   try {
     // validate data first
     const { error } = validateUser(req.body);
-    if (error) return res.status(400).json({ error: error.details[0].message });
+    //console.log("Validate data >>>>>>>>>>>>>>>"");
+    if (error)
+      return res
+        .status(400)
+        .json({ name: "ValidatingUserError", error: error.details[0].message });
 
     // then check for user existence
     let user = await User.findOne({ email: req.body.email });
-    if (user) return res.status(400).json({ msg: "User already registered." });
+    if (user)
+      return res.status(400).json({
+        name: "ValidatingUserError",
+        error: "User already registered.",
+      });
 
     // all good, then submit new user
-    user = new User(_.pick(req.body, ["name", "email", "password"]));
+    user = new User(
+      _.pick(req.body, ["email", "password", "firstName", "lastName"])
+    );
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
@@ -38,9 +52,12 @@ export const registerUser = async (req, res) => {
     res
       .header("x-auth-token", token)
       .header("access-control-expose-headers", "x-auth-token") // add custom header
-      .send(_.pick(user, ["_id", "name", "email"])); // may exlcude email later
+      .json({
+        token,
+        user: _.pick(user, ["_id", "email", "firstName", "lastName"]),
+      });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ name: error.name, error: err.message });
   }
 };
 
