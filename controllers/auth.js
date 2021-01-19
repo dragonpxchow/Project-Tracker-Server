@@ -5,18 +5,26 @@ import { User } from "../models/user.js";
 
 export const login = async (req, res) => {
   try {
+    //console.log("Server user login >>>>>>>", req.body);
     const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error)
+      return res
+        .status(400)
+        .json({ name: "UserLoginError", error: error.details[0].message });
 
     const { email, password } = req.body;
-    //console.log(email, password);
 
     let user = await User.findOne({ email: email });
-    if (!user) return res.status(400).send("Invalid email or password."); // account not found
+    if (!user)
+      return res
+        .status(400)
+        .json({ name: "UserLoginError", error: "User does not exist" });
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
-      return res.status(400).send("Invalid email or password.");
+      return res
+        .status(400)
+        .json({ name: "UserLoginError", error: "Invalid credentials" });
 
     //const token = user.generateAuthToken();
     //res.send(token);
@@ -24,20 +32,14 @@ export const login = async (req, res) => {
     // generate user's jwt token and send back
     const token = user.generateAuthToken();
     res
-      .status(200)
+      .header("x-auth-token", token)
+      .header("access-control-expose-headers", "x-auth-token") // add custom header
       .json({
         token,
         user: _.pick(user, ["_id", "email", "firstName", "lastName"]),
       });
-
-    /*
-    res
-      .header("x-auth-token", token)
-      .header("access-control-expose-headers", "x-auth-token") // add custom header
-      .send(_.pick(user, ["_id", "name", "email"]));
-    */
   } catch (err) {
-    res.status(500).json({ error: err });
+    res.status(500).json({ name: "UserLoginError", error: err.message });
   }
 };
 

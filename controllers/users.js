@@ -12,20 +12,15 @@ export const getUsers = async (req, res) => {
 
 // get single user
 export const getUser = async (req, res) => {
-  console.log("Server getUser controller >>>>", req.user);
+  //console.log("Server getUser controller >>>>", req.user);
   const user = await User.findById(req.user._id).select("-password"); // except password
   res.json(user);
-  // {
-  //  token,
-  //  user: _.pick(user, ["_id", "email", "firstName", "lastName"]),
-  //}
 };
 
 export const registerUser = async (req, res) => {
   try {
     // validate data first
     const { error } = validateUser(req.body);
-    //console.log("Validate data >>>>>>>>>>>>>>>"");
     if (error)
       return res
         .status(400)
