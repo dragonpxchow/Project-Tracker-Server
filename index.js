@@ -35,11 +35,13 @@ client.connect(err => {
 //const CONECTION_URL =
 //  "mongodb+srv://tradesman-admin:littlepiggy@reactcluster.4ttd3.mongodb.net/<dbname>?retryWrites=true&w=majority";
 
+console.log("Node server environment variables:", process.env);
+
 const port = process.env.PORT || "5000";
 console.log(
-  "Project tracker running on port " +
+  "Project tracker running on port '" +
     port +
-    " with mongo connction url " +
+    "' with mongo connction url:  " +
     process.env.CONNECTION_URL
 );
 mongoose
