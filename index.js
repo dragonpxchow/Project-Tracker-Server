@@ -36,6 +36,12 @@ client.connect(err => {
 //  "mongodb+srv://tradesman-admin:littlepiggy@reactcluster.4ttd3.mongodb.net/<dbname>?retryWrites=true&w=majority";
 
 const port = process.env.PORT || "5000";
+console.log(
+  "Project tracker running on port " +
+    port +
+    " with mongo connction url " +
+    process.env.CONNECTION_URL
+);
 mongoose
   .connect(process.env.CONNECTION_URL, {
     useNewUrlParser: true,
