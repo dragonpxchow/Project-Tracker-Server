@@ -7,10 +7,12 @@ export default (req, res, next) => {
 
   let token = req.header("x-auth-token");
 
+  /*
   console.log(
     "authMiddleware User token >>>>>>>>>>>>>>>>>>>>",
     ">>>>" + token + "<<<"
   );
+  */
 
   //  null or undefined is string from header
   if (!token || token === "null" || token === "undefined") {
