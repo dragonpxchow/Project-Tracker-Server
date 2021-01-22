@@ -20,6 +20,7 @@ app.use(cors());
 routes(app);
 // add production milldeware
 productionMiddleware(app);
+
 /*
 app.get("/", (req, res) => {
   res.send("Hello, Welcome Project Tracker API");
